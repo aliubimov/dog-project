@@ -13482,7 +13482,7 @@ GTJkWBb+Az2GwNVnQk4IAAAAAElFTkSuQmCC
 <li>What percentage of the first 100 images in <code>dog_files</code> have a detected human face? </li>
 </ul>
 <p>Ideally, we would like 100% of human images with a detected face and 0% of dog images with a detected face.  You will see that our algorithm falls short of this goal, but still gives acceptable performance.  We extract the file paths for the first 100 images from each of the datasets and store them in the numpy arrays <code>human_files_short</code> and <code>dog_files_short</code>.</p>
-<p><strong>Answer:</strong></p>
+<p><strong>Answer:</strong> I I got performance 96% human faces detected in <code>human_files</code> and 11% of human face deteced in <code>dog_files</code>. Results are pretty goot of human dataset, however on dogs dataset CNN might do better.</p>
 
 </div>
 </div>
@@ -13534,7 +13534,7 @@ Human faces detected in dogs dataset 11%
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Question 2:</strong> This algorithmic choice necessitates that we communicate to the user that we accept human images only when they provide a clear view of a face (otherwise, we risk having unneccessarily frustrated users!). In your opinion, is this a reasonable expectation to pose on the user? If not, can you think of a way to detect humans in images that does not necessitate an image with a clearly presented face?</p>
-<p><strong>Answer:</strong></p>
+<p><strong>Answer:</strong> It is not reasonable to ask user to to provide only clear view face picture. Clearly having face, is required, but not sufficien criteria to be a human. One way of detecting human on pictures is to train CNN to detect humans on picture. Dataset have to include various poses of human.</p>
 <p>We suggest the face detector from OpenCV as a potential way to detect human images in your algorithm, but you are free to explore other approaches, especially approaches that make use of deep learning :).  Please use the code cell below to design and test your own face detection algorithm.  If you decide to pursue this <em>optional</em> task, report performance on each of the datasets.</p>
 
 </div>
@@ -13851,7 +13851,7 @@ Dogs detected in dogs dataset 100%
 <p>We have imported some Python modules to get you started, but feel free to import as many modules as you need.  If you end up getting stuck, here's a hint that specifies a model that trains relatively fast on CPU and attains &gt;1% test accuracy in 5 epochs:</p>
 <p><img src="images/sample_cnn.png" alt="Sample CNN"></p>
 <p><strong>Question 4:</strong> Outline the steps you took to get to your final CNN architecture and your reasoning at each step.  If you chose to use the hinted architecture above, describe why you think that CNN architecture should work well for the image classification task.</p>
-<p><strong>Answer:</strong></p>
+<p><strong>Answer:</strong>  My reasoning was to build CNN that is possible to train in CPU (which have reasonable amount of trainable parameters) and having accuracy at least 1%. Architecture suggested above is common architecture we was using druring set of lectures and proven to be effective on imageset. Additionaly I added dropout layer to avoid overfitting and choose relu activation function between layers.</p>
 
 </div>
 </div>
@@ -14461,7 +14461,7 @@ test_{network} = bottleneck_features['test']</code></pre>
 <div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### TODO: Obtain bottleneck features from another pre-trained CNN.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### Obtain bottleneck features from another pre-trained CNN.</span>
 
 <span class="n">bottleneck_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;bottleneck_features/DogInceptionV3Data.npz&#39;</span><span class="p">)</span>
 <span class="n">train_Inception</span> <span class="o">=</span> <span class="n">bottleneck_features</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span>
@@ -14485,6 +14485,7 @@ test_{network} = bottleneck_features['test']</code></pre>
 </code></pre>
 <p><strong>Question 5:</strong> Outline the steps you took to get to your final CNN architecture and your reasoning at each step.  Describe why you think the architecture is suitable for the current problem.</p>
 <p><strong>Answer:</strong></p>
+<p>To increase learning speed CNN uses transfer learning from InceptionV3 model. Output layer of InceptionV3 model connected to flatten dense layer with shape of 133 outputs which corresponds to number of network classes. Dropout layer added to decrease overfiting of network. Softmax activation function used for last layer to provide probablities of each class.</p>
 
 </div>
 </div>
@@ -14502,8 +14503,14 @@ test_{network} = bottleneck_features['test']</code></pre>
 
 <span class="c1">### InceptionV3 model</span>
 <span class="n">Inception_model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1">### Global average pooling connects to TransferLearning features </span>
 <span class="n">Inception_model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">GlobalAveragePooling2D</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">train_Inception</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+<span class="c1">### Dropout to avoid overfitting</span>
 <span class="n">Inception_model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.15</span><span class="p">))</span>
+
+<span class="c1">### Output layer with softmax activation function</span>
 <span class="n">Inception_model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">133</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;softmax&#39;</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">Inception_model</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
@@ -14585,15 +14592,17 @@ None
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">keras.callbacks</span> <span class="k">import</span> <span class="n">ModelCheckpoint</span><span class="p">,</span> <span class="n">EarlyStopping</span>
 
-<span class="c1">### Train the model.</span>
 
+<span class="c1">### Save model once improvement in lost function is found</span>
 <span class="n">checkpointer</span> <span class="o">=</span> <span class="n">ModelCheckpoint</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="s1">&#39;saved_models/weights.best.Inception.hdf5&#39;</span><span class="p">,</span> 
                                <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">save_best_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
-<span class="c1">### Stop training when there is no more improvements</span>
+<span class="c1">### Stop training when there is no more improvements in loss function on validatoin set</span>
 <span class="n">stopper</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span> <span class="n">min_delta</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
 
+
+<span class="c1">### Train the model.</span>
 <span class="n">Inception_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_Inception</span><span class="p">,</span> <span class="n">train_targets</span><span class="p">,</span> 
           <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">valid_Inception</span><span class="p">,</span> <span class="n">valid_targets</span><span class="p">),</span>
           <span class="n">epochs</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">checkpointer</span><span class="p">,</span> <span class="n">stopper</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -45767,6 +45776,8 @@ ISraKIqiKIqiKIqiKIqi7EP+F1zOwMtM6WqLAAAAAElFTkSuQmCC
 <h2 id="Improvements">Improvements<a class="anchor-link" href="#Improvements">&#182;</a></h2><ol>
 <li>Considering all input images has different sizes and shapes, algorithm did pretty good. Use of argumentation of images to improve training data set quality</li>
 <li>Building CNN from scratch and train it might provide better result than transfer learning, however training time might take weeks and a lot of resources</li>
+<li>Experimenting with hyper-parameters might give better learning results. One way here is to train multiple networs at time and choose which have better prediction.</li>
+<li>Add cartoon dogs in data-set :)</li>
 </ol>
 
 </div>
